@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>急救指挥官 - 应急救援模拟培训平台</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            background-color: #2E86AB;
+            padding: 0.8rem 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2E86AB;
+            font-weight: bold;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .btn-login,
+        .btn-register {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-login {
+            background-color: white;
+            color: #2E86AB;
+        }
+        
+        .btn-register {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-login:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .btn-register:hover {
+            background-color: #45a049;
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            margin-top: 70px;
+            padding: 2rem 1rem;
+            flex: 1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 首页样式 */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .main-title {
+            font-size: 2.2rem;
+            color: #2E86AB;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2.5rem;
+        }
+        
+        .scene-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .scene-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .scene-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .scene-image {
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 4rem;
+        }
+        
+        .scene-video {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .scene-video video {
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .scene-video video:hover {
+            transform: scale(1.02);
+        }
+        
+        .scene-card h3 {
+            color: #2E86AB;
+            margin-bottom: 0.5rem;
+        }
+        
+        .scene-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .tag {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .scene-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .stats-section {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.2rem 1.8rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 220px;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            color: #2E86AB;
+            margin-bottom: 0.2rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* 页脚样式 */
+        .footer {
+            background-color: #333;
+            color: white;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-left,
+        .footer-center,
+        .footer-right {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .tip-scroll {
+            overflow: hidden;
+            height: 24px;
+            position: relative;
+        }
+        
+        .tip-text {
+            position: absolute;
+            width: 100%;
+            animation: scrollTips 15s infinite;
+            opacity: 0;
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 1.5rem;
+            color: #2E86AB;
+            text-align: center;
+        }
+        
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .modal-content input {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn-submit {
+            background-color: #2E86AB;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-submit:hover {
+            background-color: #267194;
+        }
+        
+        /* 模拟页面样式 */
+        .simulation-container {
+            display: none;
+            margin-top: 70px;
+            padding: 1rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .status-bar {
+            background-color: #2E86AB;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .steps-progress {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .step {
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background-color: #ff4757;
+            font-weight: bold;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+        }
+        
+        /* 步骤完成动画 */
+        @keyframes stepComplete {
+            0% { background-color: #ff4757; }
+            100% { background-color: #4CAF50; }
+        }
+        
+        .step.completed {
+            animation: stepComplete 0.5s ease forwards;
+        }
+        
+        .timer {
+            font-size: 1.1rem;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+        
+        .simulation-main {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .scene-area {
+            flex: 3;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .info-panel {
+            flex: 2;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #2E86AB;
+        }
+        
+        .instructions h3 {
+            color: #2E86AB;
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions ol {
+            padding-left: 1.2rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.3rem;
+        }
+        
+        /* 可交互元素 */
+        .interactive-element {
+            position: absolute;
+            padding: 0.8rem 1.2rem;
+            background-color: #2E86AB;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            user-select: none;
+        }
+        
+        .interactive-element:hover {
+            transform: scale(1.05);
+            background-color: #267194;
+        }
+        
+        .interactive-element.hazard {
+            background-color: #ff4757;
+        }
+        
+        .interactive-element.hazard:hover {
+            background-color: #e84151;
+        }
+        
+        .interactive-element.patient {
+            background-color: #4CAF50;
+        }
+        
+        .interactive-element.patient:hover {
+            background-color: #45a049;
+        }
+        
+        .interactive-element.aed {
+            background-color: #ff9f43;
+        }
+        
+        .interactive-element.aed:hover {
+            background-color: #ff8c2b;
+        }
+        
+        /* CPR监测区域 */
+        .monitor-area {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        .monitor-area h3 {
+            color: #2E86AB;
+            margin-bottom: 0.8rem;
+            text-align: center;
+        }
+        
+        .compression-meter {
+            margin: 1rem 0;
+        }
+        
+        .meter-scale {
+            height: 30px;
+            background: linear-gradient(to right, #ff4757 0%, #ff4757 50%, #2E86AB 50%, #2E86AB 62.5%, #ff4757 62.5%, #ff4757 100%);
+            border-radius: 15px;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        
+        .meter-indicator {
+            position: absolute;
+            height: 40px;
+            width: 4px;
+            background-color: #333;
+            top: -5px;
+            transition: left 0.3s;
+        }
+        
+        .depth-value {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2E86AB;
+            margin-top: 0.5rem;
+        }
+        
+        .frequency-display {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2E86AB;
+            margin-top: 1rem;
+        }
+        
+        .rating-area {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2E86AB;
+            text-align: center;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        /* 评分变化动画 */
+        .score-increase {
+            animation: scorePulse 0.5s ease;
+            color: #4CAF50;
+            transform: scale(1.2);
+        }
+        
+        .score-decrease {
+            animation: scorePulse 0.5s ease;
+            color: #ff4757;
+            transform: scale(1.2);
+        }
+        
+        @keyframes scorePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .deduction-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .deduction-list li {
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed #ddd;
+            color: #666;
+        }
+        
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #2E86AB;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            flex: 1;
+        }
+        
+        .action-btn:hover {
+            background-color: #267194;
+        }
+        
+        .action-btn.secondary {
+            background-color: #6c757d;
+        }
+        
+        .action-btn.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            color: white;
+            border-radius: 5px;
+            z-index: 1002;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: fadeInOut 3s forwards;
+        }
+        
+        .notification.success {
+            background-color: #4CAF50;
+        }
+        
+        .notification.error {
+            background-color: #ff4757;
+        }
+        
+        .notification.info {
+            background-color: #2E86AB;
+        }
+        
+        /* 动画 */
+        @keyframes scrollTips {
+            0%, 20% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            25%, 95% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes flash {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+        
+        /* CPR按压反馈动画 */
+        @keyframes compression {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); background-color: #45a049; }
+            100% { transform: scale(1); }
+        }
+        
+        .compression-animation {
+            animation: compression 0.3s ease;
+        }
+        
+        /* 按压深度指示器波动动画 */
+        @keyframes indicatorPulse {
+            0% { height: 40px; }
+            50% { height: 50px; }
+            100% { height: 40px; }
+        }
+        
+        .indicator-pulse {
+            animation: indicatorPulse 0.3s ease;
+        }
+        
+        /* 场景元素出场动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        /* 为不同元素设置延迟 */
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        
+        /* 动画类 */
+        .pulse-animation {
+            animation: pulse 1s infinite;
+        }
+        
+        .flash-animation {
+            animation: flash 1s infinite;
+        }
+        
+        .shake-animation {
+            animation: shake 0.5s;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero-section {
+                padding: 1rem;
+            }
+            
+            .main-title {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .simulation-main {
+                flex-direction: column;
+            }
+            
+            .footer-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-left,
+            .footer-center,
+            .footer-right {
+                min-width: 100%;
+            }
+        }
+        
+        /* 页面切换 */
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { width: 0; height: 0; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: transparent; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">救</div>
+                <span class="logo-text">急救指挥官</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" data-page="home">首页</a></li>
+                <li><a href="#" class="nav-link" data-page="simulation">急救模拟</a></li>
+                <li><a href="#" class="nav-link" data-page="knowledge">知识库</a></li>
+                <li><a href="#" class="nav-link" data-page="profile">个人中心</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <button class="btn-login" id="loginBtn">登录</button>
+                <button class="btn-register" id="registerBtn">注册</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首页 -->
+    <div class="main-content">
+        <div class="container">
+            <div id="home-page" class="page active">
+                <div class="hero-section">
+                    <h1 class="main-title">应急救援模拟培训平台</h1>
+                    <p class="subtitle">掌握急救技能，守护生命安全</p>
+                    
+                    <!-- 场景快速入口 -->
+                    <div class="scene-cards">
+                        <div class="scene-card" data-scene="home">
+                            <div class="scene-video">
+                                <video controls width="100%" height="200px" poster="https://neeko-copilot.bytedance.net/api/text2image?prompt=first%20aid%20training%20video%20thumbnail%20for%20home%20scene&image_size=square">
+                                    <source src="videos/2.mp4" type="video/mp4">
+                                    您的浏览器不支持视频播放。
+                                </video>
+                            </div>
+                            <h3>家庭场景急救</h3>
+                            <div class="scene-tags">
+                                <span class="tag">家庭</span>
+                                <span class="tag">基础</span>
+                                <span class="tag">CPR</span>
+                            </div>
+                            <p class="scene-desc">模拟家庭环境下的急救场景，包括老人突发心脏病、儿童异物卡喉等常见急救情况。</p>
+                        </div>
+                        
+                        <div class="scene-card" data-scene="outdoor">
+                            <div class="scene-video">
+                                <video controls width="100%" height="200px" poster="https://neeko-copilot.bytedance.net/api/text2image?prompt=first%20aid%20training%20video%20thumbnail%20for%20outdoor%20scene&image_size=square">
+                                    <source src="videos/1.mp4" type="video/mp4">
+                                    您的浏览器不支持视频播放。
+                                </video>
+                            </div>
+                            <h3>户外场景急救</h3>
+                            <div class="scene-tags">
+                                <span class="tag">户外</span>
+                                <span class="tag">进阶</span>
+                                <span class="tag">AED</span>
+                            </div>
+                            <p class="scene-desc">模拟户外运动、旅游等场景下的急救，包括溺水、中暑、外伤出血等紧急情况处理。</p>
+                        </div>
+                        
+                        <div class="scene-card" data-scene="office">
+                            <div class="scene-video">
+                                <video controls width="100%" height="200px" poster="https://neeko-copilot.bytedance.net/api/text2image?prompt=first%20aid%20training%20video%20thumbnail%20for%20office%20scene&image_size=square">
+                                    <source src="videos/3.mp4" type="video/mp4">
+                                    您的浏览器不支持视频播放。
+                                </video>
+                            </div>
+                            <h3>办公室场景急救</h3>
+                            <div class="scene-tags">
+                                <span class="tag">职场</span>
+                                <span class="tag">团队</span>
+                                <span class="tag">应急</span>
+                            </div>
+                            <p class="scene-desc">模拟办公环境下的突发状况，包括心脏骤停、触电、电梯困人等职场急救场景。</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 统计数据 -->
+                    <div class="stats-section">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="trained-count">1287</h3>
+                                <p class="stat-label">已培训人数</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔄</div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="simulation-count">5423</h3>
+                                <p class="stat-label">累计模拟次数</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 急救模拟页面 -->
+            <div id="simulation-page" class="page">
+                <div class="status-bar">
+                    <div>
+                        <span id="scene-name">户外场景 - 心脏骤停急救</span>
+                    </div>
+                    <div class="steps-progress">
+                        <span class="step active" id="step-1">环境评估</span>
+                        <span class="step" id="step-2">病情判断</span>
+                        <span class="step" id="step-3">急救操作</span>
+                    </div>
+                    <div class="timer">
+                        时间: <span id="timer-display">00:00</span>
+                    </div>
+                </div>
+                
+                <div class="simulation-main">
+                    <!-- 场景区域 -->
+                    <div class="scene-area" id="scene-area">
+                        <!-- 交互元素将通过JS动态添加 -->
+                    </div>
+                    
+                    <!-- 信息面板 -->
+                    <div class="info-panel">
+                        <div class="instructions">
+                            <h3>操作指引</h3>
+                            <ol id="instruction-list">
+                                <li>点击"开始环境评估"按钮</li>
+                                <li>检查场景中的危险因素</li>
+                                <li>使用绝缘棒移除危险</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="monitor-area">
+                            <h3>CPR监测</h3>
+                            <div class="compression-meter">
+                                <div class="meter-scale">
+                                    <div class="meter-indicator" id="depth-indicator" style="left: 30%;"></div>
+                                </div>
+                                <div class="depth-value">按压深度: <span id="depth-value">3.2</span> cm</div>
+                            </div>
+                            <div class="frequency-display">
+                                按压频率: <span id="frequency-value">0</span> 次/分钟
+                            </div>
+                            <div class="action-buttons">
+                                <button class="action-btn" id="start-cpr-btn">开始CPR</button>
+                                <button class="action-btn secondary" id="stop-cpr-btn">停止CPR</button>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-area">
+                            <h3>评分</h3>
+                            <div class="score-display" id="score-display">0</div>
+                            <ul class="deduction-list" id="deduction-list">
+                                <li>暂无扣分项</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" id="start-assessment-btn">开始环境评估</button>
+                    <button class="action-btn secondary" id="reset-btn">重置场景</button>
+                    <button class="action-btn secondary" id="help-btn">帮助</button>
+                </div>
+            </div>
+            
+            <!-- 知识库页面 -->
+            <div id="knowledge-page" class="page">
+                <div class="hero-section">
+                    <h1 class="main-title">急救知识库</h1>
+                    <p class="subtitle">学习专业急救知识，提升救援能力</p>
+                    
+                    <div class="scene-cards">
+                        <div class="scene-card">
+                            <div class="scene-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                ❤️
+                            </div>
+                            <h3>心肺复苏 (CPR)</h3>
+                            <div class="scene-tags">
+                                <span class="tag">基础</span>
+                                <span class="tag">必备</span>
+                                <span class="tag">CPR</span>
+                            </div>
+                            <p class="scene-desc">学习标准的心肺复苏操作流程，包括按压深度、频率和人工呼吸技巧。</p>
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="showKnowledge('cpr')">学习</button>
+                            </div>
+                        </div>
+                        
+                        <div class="scene-card">
+                            <div class="scene-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                ⚡
+                            </div>
+                            <h3>AED使用</h3>
+                            <div class="scene-tags">
+                                <span class="tag">进阶</span>
+                                <span class="tag">设备</span>
+                                <span class="tag">除颤</span>
+                            </div>
+                            <p class="scene-desc">掌握自动体外除颤器的正确使用方法，包括电极片粘贴位置和操作步骤。</p>
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="showKnowledge('aed')">学习</button>
+                            </div>
+                        </div>
+                        
+                        <div class="scene-card">
+                            <div class="scene-image" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                🏊
+                            </div>
+                            <h3>溺水急救</h3>
+                            <div class="scene-tags">
+                                <span class="tag">户外</span>
+                                <span class="tag">紧急</span>
+                                <span class="tag">救援</span>
+                            </div>
+                            <p class="scene-desc">学习溺水者的救援方法和急救措施，确保安全有效的救援。</p>
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="showKnowledge('drowning')">学习</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="knowledge-detail" style="display:none; margin-top: 2rem; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <h2 id="knowledge-title"></h2>
+                        <div id="knowledge-content"></div>
+                        <div class="action-buttons" style="margin-top: 1.5rem;">
+                            <button class="action-btn secondary" onclick="hideKnowledge()">返回知识库</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 个人中心页面 -->
+            <div id="profile-page" class="page">
+                <div class="hero-section">
+                    <h1 class="main-title">个人中心</h1>
+                    
+                    <div class="stats-section" style="justify-content: flex-start; gap: 1.5rem;">
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="user-score">0</h3>
+                                <p class="stat-label">累计得分</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="completed-simulations">0</h3>
+                                <p class="stat-label">完成模拟</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="total-time">0</h3>
+                                <p class="stat-label">总训练时间(分钟)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 2rem;">
+                        <h2 style="color: #2E86AB; margin-bottom: 1rem;">训练记录</h2>
+                        <div id="training-records" style="min-height: 200px; display: flex; align-items: center; justify-content: center; color: #666;">
+                            暂无训练记录
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeLogin">&times;</span>
+            <h2>用户登录</h2>
+            <form id="loginForm">
+                <input type="text" id="loginUsername" placeholder="用户名" required>
+                <input type="password" id="loginPassword" placeholder="密码" required>
+                <button type="submit" class="btn-submit">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 注册弹窗 -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeRegister">&times;</span>
+            <h2>用户注册</h2>
+            <form id="registerForm">
+                <input type="text" id="registerUsername" placeholder="用户名" required>
+                <input type="email" id="registerEmail" placeholder="邮箱" required>
+                <input type="password" id="registerPassword" placeholder="密码" required>
+                <input type="password" id="registerConfirmPassword" placeholder="确认密码" required>
+                <button type="submit" class="btn-submit">注册</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 帮助弹窗 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeHelp">&times;</span>
+            <h2>急救模拟帮助</h2>
+            <div style="margin-top: 1rem;">
+                <h3>操作指南：</h3>
+                <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>首先进行环境评估，移除所有危险因素</li>
+                    <li>检查患者病情，点击不同身体部位进行检查</li>
+                    <li>按照CPR标准进行急救操作</li>
+                    <li>观察右侧监测数据，确保操作达标</li>
+                </ol>
+                <h3 style="margin-top: 1rem;">CPR标准：</h3>
+                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>按压深度：5-6厘米</li>
+                    <li>按压频率：100-120次/分钟</li>
+                    <li>按压与放松时间大致相等</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentUser = null;
+        let currentScene = 'outdoor';
+        let currentStep = 1;
+        let simulationScore = 0;
+        let cprInterval = null;
+        let cprCount = 0;
+        let cprStartTime = null;
+        
+        // DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化导航
+            initNavigation();
+            
+            // 初始化事件监听器
+            initEventListeners();
+            
+            // 初始化模拟场景
+            initSimulation();
+            
+            // 检查登录状态
+            checkLoginStatus();
+            
+            // 初始化统计数字动画
+            animateCounter('trained-count', 1287);
+            animateCounter('simulation-count', 5423);
+            
+            // 初始化用户数据
+            updateUserData();
+        });
+        
+        // 初始化导航
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    
+                    // 添加当前active类
+                    this.classList.add('active');
+                    const pageId = this.getAttribute('data-page') + '-page';
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // 如果是模拟页面，初始化场景
+                    if (pageId === 'simulation-page') {
+                        resetSimulation();
+                    }
+                });
+            });
+            
+            // 场景卡片点击事件
+            document.querySelectorAll('.scene-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const scene = this.getAttribute('data-scene');
+                    if (scene) {
+                        currentScene = scene;
+                        const sceneNames = {
+                            'home': '家庭场景',
+                            'outdoor': '户外场景',
+                            'office': '办公室场景'
+                        };
+                        document.getElementById('scene-name').textContent = sceneNames[scene] + ' - 心脏骤停急救';
+                        
+                        // 切换到模拟页面
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                        document.querySelector('[data-page="simulation"]').classList.add('active');
+                        document.getElementById('simulation-page').classList.add('active');
+                        
+                        resetSimulation();
+                    }
+                });
+            });
+        }
+        
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 登录注册按钮
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                document.getElementById('loginModal').style.display = 'block';
+            });
+            
+            document.getElementById('registerBtn').addEventListener('click', () => {
+                document.getElementById('registerModal').style.display = 'block';
+            });
+            
+            // 关闭按钮
+            document.getElementById('closeLogin').addEventListener('click', () => {
+                document.getElementById('loginModal').style.display = 'none';
+            });
+            
+            document.getElementById('closeRegister').addEventListener('click', () => {
+                document.getElementById('registerModal').style.display = 'none';
+            });
+            
+            document.getElementById('closeHelp').addEventListener('click', () => {
+                document.getElementById('helpModal').style.display = 'none';
+            });
+            
+            // 点击弹窗外关闭
+            window.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+            
+            // 表单提交
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            
+            // 模拟页面按钮
+            document.getElementById('start-assessment-btn').addEventListener('click', startAssessment);
+            document.getElementById('reset-btn').addEventListener('click', resetSimulation);
+            document.getElementById('help-btn').addEventListener('click', () => {
+                document.getElementById('helpModal').style.display = 'block';
+            });
+            
+            // CPR按钮
+            document.getElementById('start-cpr-btn').addEventListener('click', startCPR);
+            document.getElementById('stop-cpr-btn').addEventListener('click', stopCPR);
+        }
+        
+        // 动画计数器
+        function animateCounter(elementId, finalValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            let current = 0;
+            const increment = finalValue / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    element.textContent = finalValue.toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString();
+                }
+            }, 20);
+        }
+        
+        // 处理登录
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showNotification('请输入用户名和密码', 'error');
+                return;
+            }
+            
+            // 模拟API调用
+            setTimeout(() => {
+                currentUser = {
+                    username: username,
+                    id: Date.now()
+                };
+                
+                // 保存到localStorage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('userScore', '0');
+                localStorage.setItem('completedSimulations', '0');
+                localStorage.setItem('totalTime', '0');
+                
+                showNotification('登录成功！', 'success');
+                document.getElementById('loginModal').style.display = 'none';
+                updateAuthButtons();
+                updateUserData();
+                
+                // 重置表单
+                document.getElementById('loginForm').reset();
+            }, 1000);
+        }
+        
+        // 处理注册
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // 验证
+            if (password !== confirmPassword) {
+                showNotification('两次输入的密码不一致', 'error');
+                return;
+            }
+            
+            if (!username || !email || !password) {
+                showNotification('请填写所有必填项', 'error');
+                return;
+            }
+            
+            // 模拟API调用
+            setTimeout(() => {
+                showNotification('注册成功！请登录', 'success');
+                document.getElementById('registerModal').style.display = 'none';
+                document.getElementById('loginModal').style.display = 'block';
+                
+                // 重置表单
+                document.getElementById('registerForm').reset();
+            }, 1000);
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(notification);
+            
+            // 自动移除
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // 检查登录状态
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateAuthButtons();
+            }
+        }
+        
+        // 更新认证按钮状态
+        function updateAuthButtons() {
+            const authButtons = document.querySelector('.auth-buttons');
+            if (!authButtons) return;
+            
+            if (currentUser) {
+                authButtons.innerHTML = `
+                    <span style="color: white; margin-right: 1rem;">欢迎，${currentUser.username}</span>
+                    <button class="btn-login" id="logoutBtn">退出</button>
+                `;
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+            } else {
+                authButtons.innerHTML = `
+                    <button class="btn-login" id="loginBtn">登录</button>
+                    <button class="btn-register" id="registerBtn">注册</button>
+                `;
+                // 重新绑定事件
+                document.getElementById('loginBtn').addEventListener('click', () => {
+                    document.getElementById('loginModal').style.display = 'block';
+                });
+                document.getElementById('registerBtn').addEventListener('click', () => {
+                    document.getElementById('registerModal').style.display = 'block';
+                });
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateAuthButtons();
+            showNotification('已退出登录', 'info');
+            updateUserData();
+            
+            // 如果是需要登录的页面，跳转到首页
+            if (document.getElementById('profile-page').classList.contains('active')) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelector('[data-page="home"]').classList.add('active');
+                document.getElementById('home-page').classList.add('active');
+            }
+        }
+        
+        // 更新用户数据
+        function updateUserData() {
+            if (currentUser) {
+                document.getElementById('user-score').textContent = localStorage.getItem('userScore') || '0';
+                document.getElementById('completed-simulations').textContent = localStorage.getItem('completedSimulations') || '0';
+                document.getElementById('total-time').textContent = localStorage.getItem('totalTime') || '0';
+                
+                // 显示训练记录
+                const records = JSON.parse(localStorage.getItem('trainingRecords')) || [];
+                const recordsContainer = document.getElementById('training-records');
+                if (records.length > 0) {
+                    let html = '<table style="width: 100%; border-collapse: collapse;">';
+                    html += '<tr style="background-color: #2E86AB; color: white;">';
+                    html += '<th style="padding: 0.5rem; text-align: left;">日期</th>';
+                    html += '<th style="padding: 0.5rem; text-align: left;">场景</th>';
+                    html += '<th style="padding: 0.5rem; text-align: left;">得分</th>';
+                    html += '</tr>';
+                    
+                    records.forEach(record => {
+                        html += '<tr style="border-bottom: 1px solid #ddd;">';
+                        html += `<td style="padding: 0.5rem;">${record.date}</td>`;
+                        html += `<td style="padding: 0.5rem;">${record.scene}</td>`;
+                        html += `<td style="padding: 0.5rem;">${record.score}</td>`;
+                        html += '</tr>';
+                    });
+                    
+                    html += '</table>';
+                    recordsContainer.innerHTML = html;
+                }
+            } else {
+                document.getElementById('user-score').textContent = '0';
+                document.getElementById('completed-simulations').textContent = '0';
+                document.getElementById('total-time').textContent = '0';
+                document.getElementById('training-records').innerHTML = '请登录查看训练记录';
+            }
+        }
+        
+        // 初始化模拟
+        function initSimulation() {
+            // 设置初始步骤
+            updateStep(1);
+            
+            // 初始化评分
+            updateScore(0);
+            
+            // 初始化计时器
+            startTimer();
+        }
+        
+        // 重置模拟
+        function resetSimulation() {
+            // 停止CPR
+            stopCPR();
+            
+            // 重置步骤
+            currentStep = 1;
+            updateStep(1);
+            
+            // 重置评分
+            simulationScore = 0;
+            updateScore(0);
+            
+            // 重置计时器
+            resetTimer();
+            
+            // 重置场景
+            createSceneElements();
+            
+            // 更新操作指引
+            updateInstructions();
+            
+            // 清空扣分项
+            document.getElementById('deduction-list').innerHTML = '<li>暂无扣分项</li>';
+        }
+        
+        // 更新步骤
+        function updateStep(step) {
+            currentStep = step;
+            
+            // 更新步骤显示
+            document.querySelectorAll('.step').forEach((s, i) => {
+                const stepNum = i + 1;
+                if (stepNum === step) {
+                    s.classList.add('active');
+                    s.classList.remove('completed');
+                } else if (stepNum < step) {
+                    s.classList.remove('active');
+                    s.classList.add('completed');
+                } else {
+                    s.classList.remove('active', 'completed');
+                }
+            });
+            
+            // 根据步骤更新场景
+            createSceneElements();
+            
+            // 更新操作指引
+            updateInstructions();
+        }
+        
+        // 创建场景元素
+        function createSceneElements() {
+            const sceneArea = document.getElementById('scene-area');
+            sceneArea.innerHTML = '';
+            
+            // 根据当前场景和步骤添加元素
+            if (currentStep === 1) {
+                // 环境评估步骤
+                sceneArea.innerHTML = '<h3 style="color: #2E86AB; margin-bottom: 1rem;">环境评估</h3>';
+                
+                // 添加危险元素
+                const hazard = document.createElement('div');
+                hazard.className = 'interactive-element hazard fade-in-up delay-100';
+                hazard.id = 'hazard-wire';
+                hazard.innerHTML = '掉落电线<br><small>危险！</small>';
+                hazard.style.left = '60%';
+                hazard.style.top = '30%';
+                hazard.addEventListener('click', handleHazardClick);
+                sceneArea.appendChild(hazard);
+                
+                // 添加绝缘棒
+                const insulationRod = document.createElement('div');
+                insulationRod.className = 'interactive-element fade-in-up delay-200';
+                insulationRod.id = 'insulation-rod';
+                insulationRod.innerHTML = '绝缘棒<br><small>拖动使用</small>';
+                insulationRod.style.left = '20%';
+                insulationRod.style.top = '70%';
+                insulationRod.draggable = true;
+                insulationRod.addEventListener('dragstart', handleDragStart);
+                sceneArea.appendChild(insulationRod);
+                
+                // 添加患者
+                const patient = document.createElement('div');
+                patient.className = 'interactive-element patient fade-in-up delay-300';
+                patient.id = 'patient';
+                patient.innerHTML = '患者<br><small>昏迷状态</small>';
+                patient.style.left = '50%';
+                patient.style.top = '50%';
+                sceneArea.appendChild(patient);
+                
+                // 添加拖放目标区域
+                sceneArea.addEventListener('dragover', handleDragOver);
+                sceneArea.addEventListener('drop', handleDrop);
+            } else if (currentStep === 2) {
+                // 病情判断步骤
+                sceneArea.innerHTML = '<h3 style="color: #2E86AB; margin-bottom: 1rem;">病情判断</h3>';
+                
+                // 添加患者身体部位
+                const neck = document.createElement('div');
+                neck.className = 'interactive-element patient fade-in-up delay-100';
+                neck.id = 'neck';
+                neck.innerHTML = '颈部<br><small>检查颈动脉</small>';
+                neck.style.left = '50%';
+                neck.style.top = '40%';
+                neck.addEventListener('click', () => checkBodyPart('neck', '颈动脉无搏动'));
+                sceneArea.appendChild(neck);
+                
+                const chest = document.createElement('div');
+                chest.className = 'interactive-element patient fade-in-up delay-200';
+                chest.id = 'chest';
+                chest.innerHTML = '胸部<br><small>检查呼吸</small>';
+                chest.style.left = '50%';
+                chest.style.top = '55%';
+                chest.addEventListener('click', () => checkBodyPart('chest', '无自主呼吸'));
+                sceneArea.appendChild(chest);
+                
+                const eyes = document.createElement('div');
+                eyes.className = 'interactive-element patient fade-in-up delay-300';
+                eyes.id = 'eyes';
+                eyes.innerHTML = '眼部<br><small>检查瞳孔</small>';
+                eyes.style.left = '40%';
+                eyes.style.top = '30%';
+                eyes.addEventListener('click', () => checkBodyPart('eyes', '瞳孔散大，对光无反应'));
+                sceneArea.appendChild(eyes);
+            } else if (currentStep === 3) {
+                // 急救操作步骤
+                sceneArea.innerHTML = '<h3 style="color: #2E86AB; margin-bottom: 1rem;">急救操作 - CPR</h3>';
+                
+                // 添加按压区域
+                const compressionArea = document.createElement('div');
+                compressionArea.className = 'interactive-element patient fade-in-up delay-100';
+                compressionArea.id = 'compression-area';
+                compressionArea.innerHTML = '按压区域<br><small>点击进行CPR按压</small>';
+                compressionArea.style.left = '50%';
+                compressionArea.style.top = '50%';
+                compressionArea.style.width = '120px';
+                compressionArea.style.transform = 'translateX(-50%)';
+                compressionArea.addEventListener('click', handleCompression);
+                sceneArea.appendChild(compressionArea);
+                
+                // 添加AED设备
+                const aed = document.createElement('div');
+                aed.className = 'interactive-element aed fade-in-up delay-200';
+                aed.id = 'aed';
+                aed.innerHTML = 'AED设备<br><small>点击使用</small>';
+                aed.style.left = '80%';
+                aed.style.top = '70%';
+                aed.addEventListener('click', useAED);
+                sceneArea.appendChild(aed);
+            }
+        }
+        
+        // 更新操作指引
+        function updateInstructions() {
+            const instructionList = document.getElementById('instruction-list');
+            instructionList.innerHTML = '';
+            
+            if (currentStep === 1) {
+                instructionList.innerHTML = `
+                    <li>点击"开始环境评估"按钮</li>
+                    <li>检查场景中的危险因素（红色标记）</li>
+                    <li>将绝缘棒拖到电线上移除危险</li>
+                    <li>确保环境安全后再接近患者</li>
+                `;
+            } else if (currentStep === 2) {
+                instructionList.innerHTML = `
+                    <li>点击患者颈部检查颈动脉搏动</li>
+                    <li>点击患者胸部检查呼吸</li>
+                    <li>点击患者眼部检查瞳孔</li>
+                    <li>根据检查结果判断病情</li>
+                `;
+            } else if (currentStep === 3) {
+                instructionList.innerHTML = `
+                    <li>点击"开始CPR"按钮</li>
+                    <li>点击患者胸部进行按压</li>
+                    <li>保持按压深度5-6厘米（绿色区域）</li>
+                    <li>保持按压频率100-120次/分钟</li>
+                    <li>30次按压后点击AED设备</li>
+                `;
+            }
+        }
+        
+        // 开始环境评估
+        function startAssessment() {
+            if (currentStep === 1) {
+                showNotification('开始环境评估，请检查危险因素', 'info');
+                
+                // 闪烁提示危险因素
+                const hazard = document.getElementById('hazard-wire');
+                if (hazard) {
+                    hazard.classList.add('flash-animation');
+                }
+            }
+        }
+        
+        // 处理危险点击
+        function handleHazardClick() {
+            showNotification('危险！请使用绝缘棒移除电线', 'error');
+            addDeduction('直接触碰危险电线', 10);
+        }
+        
+        // 拖拽开始
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+        
+        // 拖拽经过
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+        
+        // 放置
+        function handleDrop(e) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const draggable = document.getElementById(id);
+            
+            // 检查是否将绝缘棒拖到电线上
+            if (id === 'insulation-rod' && e.target.id === 'hazard-wire') {
+                // 移除危险
+                const hazard = document.getElementById('hazard-wire');
+                hazard.innerHTML = '已移除<br><small>安全</small>';
+                hazard.classList.remove('hazard', 'flash-animation');
+                hazard.classList.add('patient');
+                hazard.style.backgroundColor = '#4CAF50';
+                
+                showNotification('环境危险已排除！', 'success');
+                addScore(20);
+                
+                // 2秒后进入下一步
+                setTimeout(() => {
+                    updateStep(2);
+                }, 2000);
+            }
+        }
+        
+        // 检查身体部位
+        function checkBodyPart(part, result) {
+            showNotification(`检查${result}`, 'info');
+            addScore(10);
+            
+            // 如果所有部位都检查过了，进入下一步
+            const checkedParts = JSON.parse(localStorage.getItem('checkedParts') || '[]');
+            if (!checkedParts.includes(part)) {
+                checkedParts.push(part);
+                localStorage.setItem('checkedParts', JSON.stringify(checkedParts));
+            }
+            
+            if (checkedParts.length >= 3) {
+                setTimeout(() => {
+                    updateStep(3);
+                    localStorage.removeItem('checkedParts');
+                }, 1000);
+            }
+        }
+        
+        // 处理按压
+        function handleCompression() {
+            if (cprInterval) {
+                // 模拟按压深度（随机在3-7cm之间）
+                const depth = 3 + Math.random() * 4;
+                document.getElementById('depth-value').textContent = depth.toFixed(1);
+                
+                // 更新深度指示器 (3-7cm对应30%-70%)
+                const indicatorPos = 30 + (depth - 3) * 10;
+                document.getElementById('depth-indicator').style.left = indicatorPos + '%';
+                
+                // 检查是否在正确范围
+                if (depth >= 5 && depth <= 6) {
+                    document.getElementById('depth-value').style.color = '#4CAF50';
+                    addScore(1);
+                } else {
+                    document.getElementById('depth-value').style.color = '#ff4757';
+                    addDeduction(`按压深度${depth.toFixed(1)}cm不达标`, 1);
+                }
+                
+                // 添加按压动画
+                this.classList.add('compression-animation');
+                setTimeout(() => {
+                    this.classList.remove('compression-animation');
+                }, 300);
+                
+                // 深度指示器动画
+                const indicator = document.getElementById('depth-indicator');
+                indicator.classList.add('indicator-pulse');
+                setTimeout(() => {
+                    indicator.classList.remove('indicator-pulse');
+                }, 300);
+            }
+        }
+        
+        // 开始CPR
+        function startCPR() {
+            if (!cprInterval) {
+                cprStartTime = Date.now();
+                cprCount = 0;
+                
+                // 开始计数
+                cprInterval = setInterval(() => {
+                    cprCount++;
+                    const elapsedSeconds = (Date.now() - cprStartTime) / 1000;
+                    const frequency = Math.round((cprCount / elapsedSeconds) * 60);
+                    document.getElementById('frequency-value').textContent = frequency;
+                    
+                    // 检查频率是否在正确范围
+                    if (frequency >= 100 && frequency <= 120) {
+                        document.getElementById('frequency-value').style.color = '#4CAF50';
+                    } else {
+                        document.getElementById('frequency-value').style.color = '#ff4757';
+                        if (cprCount % 10 === 0) {
+                            addDeduction(`按压频率${frequency}次/分钟不达标`, 1);
+                        }
+                    }
+                    
+                    // 每30次按压提示使用AED
+                    if (cprCount === 30) {
+                        showNotification('已完成30次按压，请使用AED设备', 'info');
+                        document.getElementById('aed').classList.add('flash-animation');
+                    }
+                }, 100);
+                
+                showNotification('CPR开始，请点击患者胸部进行按压', 'info');
+            }
+        }
+        
+        // 停止CPR
+        function stopCPR() {
+            if (cprInterval) {
+                clearInterval(cprInterval);
+                cprInterval = null;
+                
+                // 计算最终频率
+                const elapsedSeconds = (Date.now() - cprStartTime) / 1000;
+                const frequency = Math.round((cprCount / elapsedSeconds) * 60);
+                
+                showNotification(`CPR停止，总按压${cprCount}次，平均频率${frequency}次/分钟`, 'info');
+            }
+        }
+        
+        // 使用AED
+        function useAED() {
+            if (cprCount >= 30) {
+                showNotification('AED使用正确！电极片粘贴位置正确，开始分析心律...', 'success');
+                addScore(30);
+                document.getElementById('aed').classList.remove('flash-animation');
+                
+                // 完成模拟
+                setTimeout(() => {
+                    completeSimulation();
+                }, 2000);
+            } else {
+                showNotification('请先完成30次CPR按压', 'error');
+            }
+        }
+        
+        // 完成模拟
+        function completeSimulation() {
+            stopCPR();
+            showNotification(`模拟完成！最终得分: ${simulationScore}`, 'success');
+            
+            // 保存记录
+            if (currentUser) {
+                const currentScore = parseInt(localStorage.getItem('userScore') || '0');
+                localStorage.setItem('userScore', (currentScore + simulationScore).toString());
+                
+                const currentSimulations = parseInt(localStorage.getItem('completedSimulations') || '0');
+                localStorage.setItem('completedSimulations', (currentSimulations + 1).toString());
+                
+                const currentTime = parseInt(localStorage.getItem('totalTime') || '0');
+                localStorage.setItem('totalTime', (currentTime + 1).toString());
+                
+                // 保存训练记录
+                const records = JSON.parse(localStorage.getItem('trainingRecords') || '[]');
+                const sceneNames = {
+                    'home': '家庭场景',
+                    'outdoor': '户外场景',
+                    'office': '办公室场景'
+                };
+                records.unshift({
+                    date: new Date().toLocaleDateString(),
+                    scene: sceneNames[currentScene] || '户外场景',
+                    score: simulationScore
+                });
+                
+                if (records.length > 10) records.length = 10; // 只保留最近10条
+                localStorage.setItem('trainingRecords', JSON.stringify(records));
+                
+                updateUserData();
+            }
+            
+            // 3秒后重置
+            setTimeout(() => {
+                resetSimulation();
+            }, 3000);
+        }
+        
+        // 更新评分
+        function updateScore(points) {
+            simulationScore = Math.max(0, points);
+            document.getElementById('score-display').textContent = simulationScore;
+        }
+        
+        // 增加分数
+        function addScore(points) {
+            simulationScore += points;
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.textContent = simulationScore;
+            scoreDisplay.classList.add('score-increase');
+            setTimeout(() => {
+                scoreDisplay.classList.remove('score-increase');
+            }, 500);
+        }
+        
+        // 添加扣分项
+        function addDeduction(reason, points) {
+            simulationScore = Math.max(0, simulationScore - points);
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.textContent = simulationScore;
+            scoreDisplay.classList.add('score-decrease');
+            setTimeout(() => {
+                scoreDisplay.classList.remove('score-decrease');
+            }, 500);
+            
+            const deductionList = document.getElementById('deduction-list');
+            const li = document.createElement('li');
+            li.textContent = `${reason}，扣${points}分`;
+            deductionList.prepend(li);
+            
+            // 限制显示数量
+            const items = deductionList.querySelectorAll('li');
+            if (items.length > 5) {
+                items[items.length - 1].remove();
+            }
+        }
+        
+        // 计时器
+        let timerInterval = null;
+        let timerSeconds = 0;
+        
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const minutes = Math.floor(timerSeconds / 60);
+                    const seconds = timerSeconds % 60;
+                    document.getElementById('timer-display').textContent =                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+        }
+        
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            document.getElementById('timer-display').textContent = '00:00';
+            timerInterval = null;
+            startTimer();
+        }
+        
+        // 知识库功能
+        function showKnowledge(type) {
+            const knowledgeDetail = document.getElementById('knowledge-detail');
+            const titleElement = document.getElementById('knowledge-title');
+            const contentElement = document.getElementById('knowledge-content');
+            
+            // 设置标题和内容
+            if (type === 'cpr') {
+                titleElement.textContent = '心肺复苏 (CPR) 操作指南';
+                contentElement.innerHTML = `
+                    <div style="line-height: 1.8;">
+                        <h3 style="color: #2E86AB; margin: 1rem 0;">CPR操作步骤：</h3>
+                        <ol style="margin-left: 1.5rem;">
+                            <li><strong>环境评估</strong>：确保现场安全，避免施救者和患者受到二次伤害</li>
+                            <li><strong>检查意识</strong>：轻拍患者双肩，大声呼唤，检查是否有反应</li>
+                            <li><strong>呼救求援</strong>：立即拨打120，请求AED和专业人员支援</li>
+                            <li><strong>检查呼吸</strong>：观察患者胸部是否起伏，检查时间5-10秒</li>
+                            <li><strong>胸外按压</strong>：
+                                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                    <li>按压位置：胸骨下半部，两乳头连线中点</li>
+                                    <li>按压深度：5-6厘米</li>
+                                    <li>按压频率：100-120次/分钟</li>
+                                    <li>按压手法：掌根重叠，手指交叉抬起，垂直用力</li>
+                                </ul>
+                            </li>
+                            <li><strong>开放气道</strong>：清除口腔异物，采用仰头抬颏法</li>
+                            <li><strong>人工呼吸</strong>：捏住鼻子，口对口吹气，每次1秒，可见胸廓起伏</li>
+                        </ol>
+                        
+                        <h3 style="color: #2E86AB; margin: 1rem 0;">注意事项：</h3>
+                        <ul style="margin-left: 1.5rem;">
+                            <li>按压时要快速有力，避免中断</li>
+                            <li>按压与放松时间相等，放松时掌根不离开胸壁</li>
+                            <li>成人按压通气比为30:2，儿童可考虑15:2</li>
+                            <li>持续进行直到专业人员到达或患者恢复自主呼吸</li>
+                        </ul>
+                        
+                        <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <strong>重要提示：</strong>本指南仅供学习参考，实际急救请遵循专业培训指导。
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'aed') {
+                titleElement.textContent = '自动体外除颤器 (AED) 使用指南';
+                contentElement.innerHTML = `
+                    <div style="line-height: 1.8;">
+                        <h3 style="color: #2E86AB; margin: 1rem 0;">AED操作步骤：</h3>
+                        <ol style="margin-left: 1.5rem;">
+                            <li><strong>开启AED</strong>：打开设备电源，遵循语音提示操作</li>
+                            <li><strong>粘贴电极片</strong>：
+                                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                    <li>成人/儿童：一片贴在右上胸壁（锁骨下方），一片贴在左乳头外侧</li>
+                                    <li>婴儿：两片电极片可贴在前后胸壁</li>
+                                </ul>
+                            </li>
+                            <li><strong>连接电极片</strong>：将电极片连接线插入AED主机</li>
+                            <li><strong>分析心律</strong>：确保所有人离开患者，按下分析按钮</li>
+                            <li><strong>电击除颤</strong>：如果AED建议电击，确保无人接触患者后按下电击按钮</li>
+                            <li><strong>继续CPR</strong>：电击后立即恢复胸外按压，遵循AED语音提示</li>
+                        </ol>
+                        
+                        <h3 style="color: #2E86AB; margin: 1rem 0;">注意事项：</h3>
+                        <ul style="margin-left: 1.5rem;">
+                            <li>使用前确保患者胸部干燥，去除金属物品和药物贴片</li>
+                            <li>水中施救时，先将患者移至干燥处再使用AED</li>
+                            <li>分析和电击时，必须确保无人接触患者</li>
+                            <li>AED不会对无心律的患者造成伤害</li>
+                        </ul>
+                        
+                        <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <strong>重要提示：</strong>AED仅适用于心室颤动或室性心动过速导致的心脏骤停。
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'drowning') {
+                titleElement.textContent = '溺水急救指南';
+                contentElement.innerHTML = `
+                    <div style="line-height: 1.8;">
+                        <h3 style="color: #2E86AB; margin: 1rem 0;">溺水救援步骤：</h3>
+                        <ol style="margin-left: 1.5rem;">
+                            <li><strong>自我保护</strong>：确保救援者自身安全，避免被溺水者拖拽</li>
+                            <li><strong>呼救求援</strong>：立即拨打120，寻求专业救援</li>
+                            <li><strong>抛投救援</strong>：优先使用竹竿、绳索、救生圈等工具进行救援</li>
+                            <li><strong>接近患者</strong>：从背后接近，避免被溺水者抱住</li>
+                            <li><strong>移至岸边</strong>：将溺水者平稳移至坚实平面</li>
+                            <li><strong>检查意识</strong>：轻拍呼唤，判断是否有意识</li>
+                            <li><strong>清除异物</strong>：清理口腔鼻腔内的水草、泥沙等异物</li>
+                            <li><strong>心肺复苏</strong>：
+                                <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                    <li>无呼吸/脉搏：立即开始CPR，先按压后通气</li>
+                                    <li>有呼吸/无脉搏：仅进行胸外按压</li>
+                                    <li>有脉搏/无呼吸：仅进行人工呼吸</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        
+                        <h3 style="color: #2E86AB; margin: 1rem 0;">注意事项：</h3>
+                        <ul style="margin-left: 1.5rem;">
+                            <li>不要进行控水操作，以免延误CPR时机</li>
+                            <li>溺水患者即使恢复呼吸，也需要送医检查</li>
+                            <li>低温溺水患者需注意保暖，避免体温过低</li>
+                            <li>儿童溺水可能无声无息，需时刻监护</li>
+                        </ul>
+                        
+                        <div style="background-color: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <strong>重要提示：</strong>预防胜于救援，加强儿童监护，远离危险水域。
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // 显示详情
+            knowledgeDetail.style.display = 'block';
+            
+            // 平滑滚动到详情区域
+            knowledgeDetail.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function hideKnowledge() {
+            document.getElementById('knowledge-detail').style.display = 'none';
+        }
+        
+        // 确保页面卸载时清理定时器
+        window.addEventListener('beforeunload', function() {
+            clearInterval(timerInterval);
+            clearInterval(cprInterval);
+        });
+    </script>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="logo" style="margin-bottom: 0.5rem;">
+                    <div class="logo-icon">救</div>
+                    <span class="logo-text">急救指挥官</span>
+                </div>
+                <p style="font-size: 0.9rem; color: #ccc;">应急救援模拟培训平台 © 2025</p>
+            </div>
+            <div class="footer-center">
+                <div class="tip-scroll">
+                    <div class="tip-text">急救知识仅供学习参考，实际操作请遵循专业指导</div>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p style="font-size: 0.9rem; color: #ccc;">联系我们：support@firstaid.com</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
